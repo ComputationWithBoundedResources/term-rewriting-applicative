@@ -1,0 +1,40 @@
+name:          term-rewriting-applicative
+version:       0.2
+stability:     experimental
+author:        Martin Avanzini, Ugo Dal Lago
+maintainer:    Martin Avanzini <martin.avanzini@uibk.ac.at>
+license:       MIT
+license-file:  LICENSE
+category:      Logic
+synopsis:      Applicative Term Rewrite Systems
+description:
+build-type:    Simple
+cabal-version: >= 1.8
+
+
+source-repository head
+    type: git
+    location: git://github.com/ComputationWithBoundedResources/term-rewriting-applicative
+
+library
+    hs-source-dirs:
+        src
+    exposed-modules: Data.Rewriting.Applicative.Term
+                     Data.Rewriting.Applicative.Rule
+                     Data.Rewriting.Applicative.Rules
+                     Data.Rewriting.Applicative.SimpleTypes
+
+    build-depends: ansi-wl-pprint >= 0.6 && < 0.7
+                 , base >= 4 && < 5
+                 , containers >= 0.3 && < 0.6
+                 , mtl >= 1.1 && < 2.3
+                 , term-rewriting >= 0.2 && < 0.3
+    extensions: TypeSynonymInstances
+              , FlexibleContexts 
+              , FlexibleInstances
+              , GeneralizedNewtypeDeriving
+              , TypeOperators
+              , ViewPatterns
+              , TupleSections
+    ghc-options:       
+     -threaded -Wall -O2 -fno-warn-orphans -fno-spec-constr-count -rtsopts -with-rtsopts=-N
