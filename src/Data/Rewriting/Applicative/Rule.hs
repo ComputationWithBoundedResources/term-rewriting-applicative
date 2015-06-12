@@ -3,7 +3,7 @@
 module Data.Rewriting.Applicative.Rule (
   -- * Type
   ARule
-
+  , Rule (..)
   -- * specific for rules in applicative form
   , rule
   , funs
@@ -11,8 +11,6 @@ module Data.Rewriting.Applicative.Rule (
   , mapRule
 
   -- * re-exported from 'Data.Rewriting.Rule'
-  , lhs
-  , rhs
   , prettyRule
   , vars
   , varsDL
@@ -39,7 +37,7 @@ module Data.Rewriting.Applicative.Rule (
 import qualified Data.Rewriting.Applicative.Term as T
 import qualified Data.Rewriting.Rule as R
 
-import Data.Rewriting.Rule.Type  (lhs, rhs)
+import Data.Rewriting.Rule.Type
 import Data.Rewriting.Rule.Pretty (prettyRule)
 import Data.Rewriting.Rule.Ops hiding (funsDL, funs)
 

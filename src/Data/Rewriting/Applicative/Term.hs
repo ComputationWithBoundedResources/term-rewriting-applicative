@@ -17,7 +17,8 @@ module Data.Rewriting.Applicative.Term
        , aform
        , hd         
        , args
-
+       , amap
+       
        , headSymbol
        , headVars
        , funsDL
@@ -29,10 +30,9 @@ where
 
 import qualified Data.Rewriting.Term as T
 
-import           Data.Rewriting.Term hiding (map, funs, funsDL, Term(..))
+import           Data.Rewriting.Term hiding (map, funs, funsDL)
 
 import Data.Maybe (fromJust)
-import Control.Applicative ((<$>))
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
 
 --------------------------------------------------------------------------------
@@ -82,16 +82,16 @@ instance PP.Pretty f => PP.Pretty (ASym f) where
 -- applicative view of term
 
 -- | View for applicative terms
-data AView f v = Var v -- ^ Variable
-               | Fun f [ATerm f v] -- ^ n-ary function application 
+data AView f v = TVar v -- ^ Variable
+               | TFun f [ATerm f v] -- ^ n-ary function application 
                | ATerm f v :@ ATerm f v -- ^ application
 
 
 -- | constructs applicative view of a term, returns 'Nothing' iff the given term is not 'wellformed'
 atermM :: ATerm f v -> Maybe (AView f v)
-atermM (T.Var v) = Just (Var v)
+atermM (T.Var v) = Just (TVar v)
 atermM (T.Fun App [t1,t2]) = Just (t1 :@ t2)
-atermM (T.Fun (Sym f) ts) = Just (Fun f ts)
+atermM (T.Fun (Sym f) ts) = Just (TFun f ts)
 atermM _ = Nothing
 
 -- | partial version of 'atermM', total on 'wellformed' terms
@@ -120,11 +120,17 @@ hd t = fst <$> aform t
 args :: ATerm f v -> Maybe [ATerm f v]
 args t = snd <$> aform t
 
+-- | Similar to 'Data.Rewriting.Term.map'
+amap :: (f -> f') -> (v -> v') -> ATerm f v -> ATerm f' v'
+amap _  fv (T.Var v) = T.Var (fv v)
+amap ff fv (T.Fun f ts) = T.Fun f' (map (amap ff fv) ts) where
+     f' = case f of { Sym g -> Sym (ff g); App -> App }
+
 -- | Returns the root symbol of the head term, if existing
 --
 -- prop> hd t == Just (T.Fun f ts)  <==>  headSymbol t == Just f
 headSymbol :: ATerm f v -> Maybe f
-headSymbol (atermM -> Just (Fun f _)) = Just f
+headSymbol (atermM -> Just (TFun f _)) = Just f
 headSymbol (atermM -> Just (t1 :@ _)) = headSymbol t1
 headSymbol _ = Nothing
 

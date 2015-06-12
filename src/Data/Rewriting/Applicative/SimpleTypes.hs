@@ -87,8 +87,8 @@ evalTInferM m = evalRWST (runTInfer m) () 0
 typeOf :: (Ord v, Ord f) => Env v -> Signature f -> ATerm f v -> Maybe Type
 typeOf env sig t =
   case atermM t of
-   Just (Var v) -> Map.lookup v env
-   Just (Fun f _) -> outputType <$> Map.lookup f sig
+   Just (TVar v) -> Map.lookup v env
+   Just (TFun f _) -> outputType <$> Map.lookup f sig
    Just (t1 :@ t2) -> do
      tp1 <- typeOf env sig t1
      tp2 <- typeOf env sig t2     
@@ -150,12 +150,12 @@ inferTypes rs = do
     inTypeVar f i = T.Var (TIn f i)
     outTypeVar f = T.Var (TOut f)
     
-    e |- (aterm -> Var v, a) = T.Var (fromJust (Map.lookup v e)) =~ a
+    e |- (aterm -> TVar v, a) = T.Var (fromJust (Map.lookup v e)) =~ a
     e |- (aterm -> t1 :@ t2, a) = do
       b <- freshVar
       e |- (t1, T.Fun TApp [b,a])
       e |- (t2, b)
-    e |- (aterm -> Fun f ts, a) = do
+    e |- (aterm -> TFun f ts, a) = do
       outTypeVar f =~ a
       mapM_ (\(i,ti) -> e |- (ti, inTypeVar f i)) (zip [0..] ts)
     _ |- _ = throwError "non-applicative term trs given"  
