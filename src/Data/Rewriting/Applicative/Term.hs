@@ -23,6 +23,7 @@ module Data.Rewriting.Applicative.Term
        , headVars
        , funsDL
        , funs
+       , withArity
          -- * Re-exported Term operatons
        , module Data.Rewriting.Term
        )
@@ -30,7 +31,7 @@ where
 
 import qualified Data.Rewriting.Term as T
 
-import           Data.Rewriting.Term hiding (map, funs, funsDL)
+import           Data.Rewriting.Term hiding (map, funs, funsDL, withArity)
 
 import Data.Maybe (fromJust)
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
@@ -73,6 +74,13 @@ fun f = T.Fun (Sym f)
 -- | constructor for variables
 var :: v -> ATerm f v
 var = T.Var
+
+
+withArity :: ATerm f v -> ATerm (f,Int) v
+withArity = fold var withAr where
+  withAr App ls = Fun App ls
+  withAr (Sym f) ls = fun (f,length ls) ls
+
 
 instance PP.Pretty f => PP.Pretty (ASym f) where
   pretty App = PP.text "@"

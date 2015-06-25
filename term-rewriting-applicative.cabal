@@ -22,6 +22,7 @@ library
     exposed-modules: Data.Rewriting.Applicative.Term
                      Data.Rewriting.Applicative.Rule
                      Data.Rewriting.Applicative.Rules
+                     Data.Rewriting.Applicative.Problem                     
                      Data.Rewriting.Applicative.SimpleTypes
 
     build-depends: ansi-wl-pprint >= 0.6 && < 0.7
