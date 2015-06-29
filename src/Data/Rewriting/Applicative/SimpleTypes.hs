@@ -28,7 +28,7 @@ import qualified Data.Rewriting.Substitution.Type as ST
 import           Data.Rewriting.Substitution.Unify (unify)
 
 import           Data.Rewriting.Applicative.Term (ASym (..), ATerm, atermM, aterm, AView (..))
-import           Data.Rewriting.Applicative.Rule (ARule, mapRule)
+import           Data.Rewriting.Applicative.Rule (ARule, mapSides)
 import           Data.List (nub)
 import           Data.Maybe (fromJust, isNothing)
 import qualified Data.Map as Map
@@ -128,7 +128,7 @@ unType :: ATypedTerm f v -> ATerm f v
 unType = T.map fst fst
 
 unTypeRule :: ATypedRule f v -> ARule f v
-unTypeRule  = mapRule unType
+unTypeRule  = mapSides unType
 
 unTypeRules :: [ATypedRule f v] -> [ARule f v]
 unTypeRules = map unTypeRule
@@ -140,7 +140,7 @@ inferTypes rs = do
   return $ flip State.evalState (Map.empty, 0::Int) $ do
         sig <- mkSignature assign
         envs <- mapM (mkEnv assign) es
-        return (sig, [ (i,(mapRule (fromJust . withType env sig) rl, env)) | ((i,rl),env) <- zip rs envs ])
+        return (sig, [ (i,(mapSides (fromJust . withType env sig) rl, env)) | ((i,rl),env) <- zip rs envs ])
   where
     freshM = modify succ >> (TFresh <$> get)
     freshVar = T.Var <$> freshM
@@ -208,6 +208,6 @@ inferTypes rs = do
                 return (Map.insert f (TypeDecl ins out) sig))       
       Map.empty fs
       where 
-        fs = nub [ (f,ar) | (Sym f,ar) <- RS.funs (map (mapRule T.withArity . snd) rs)]
+        fs = nub [ (f,ar) | (Sym f,ar) <- RS.funs (map (mapSides T.withArity . snd) rs)]
 
 

@@ -9,6 +9,7 @@ module Data.Rewriting.Applicative.Rule (
   , funs
   , funsDL
   , mapRule
+  , mapSides
 
   -- * re-exported from 'Data.Rewriting.Rule'
   , prettyRule
@@ -53,6 +54,9 @@ funs = flip funsDL []
 funsDL :: ARule f v -> [f] -> [f]
 funsDL r = T.funsDL (lhs r) . T.funsDL (rhs r)
 
-mapRule :: (R.Term f v -> R.Term g w) -> R.Rule f v -> R.Rule g w
-mapRule f r = R.Rule{ R.lhs = f (R.lhs r), R.rhs = f (R.rhs r) }
+mapSides :: (T.Term f v -> T.Term f' v') -> R.Rule f v -> R.Rule f' v'
+mapSides f r = R.Rule{ R.lhs = f (R.lhs r), R.rhs = f (R.rhs r) }
+
+mapRule :: (f -> f') -> (v -> v') -> ARule f v -> ARule f' v'
+mapRule f v = mapSides (T.amap f v)
 
