@@ -4,9 +4,11 @@ module Data.Rewriting.Applicative.Rules (
   module Data.Rewriting.Rules
   , funs
   , funsDL
-  , mapRules
+  , amap
   ) where
 
+import Prelude hiding (map)
+import qualified Prelude as P
 import Data.Rewriting.Rules hiding (funs,funsDL)
 import qualified Data.Rewriting.Applicative.Rule as R
 
@@ -17,5 +19,5 @@ funs = flip funsDL []
 funsDL :: [R.ARule f v] -> [f] -> [f]
 funsDL rs fs = foldr R.funsDL fs rs
 
-mapRules :: (f -> f') -> (v -> v') -> [R.ARule f v] -> [R.ARule f' v']
-mapRules f v = map (R.mapRule f v)
+amap :: (f -> f') -> (v -> v') -> [R.ARule f v] -> [R.ARule f' v']
+amap f v = P.map (R.amap f v)
