@@ -26,7 +26,7 @@ library
                      Data.Rewriting.Applicative.SimpleTypes
 
     build-depends: ansi-wl-pprint >= 0.6 && < 0.7
-                 , base >= 4.7 && < 5
+                 , base >= 4.8 && < 5
                  , containers >= 0.3 && < 0.6
                  , mtl >= 1.1 && < 2.3
                  , term-rewriting >= 0.2 && < 0.3
