@@ -24,6 +24,8 @@ module Data.Rewriting.Applicative.Term
        , funsDL
        , funs
        , withArity
+       -- * Pretty-Printing
+       , prettyATerm
          -- * Re-exported Term operatons
        , module Data.Rewriting.Term
        )
@@ -80,14 +82,6 @@ withArity :: ATerm f v -> ATerm (f,Int) v
 withArity = fold var withAr where
   withAr App ls = Fun App ls
   withAr (Sym f) ls = fun (f,length ls) ls
-
-
-instance PP.Pretty f => PP.Pretty (ASym f) where
-  pretty App = PP.text "@"
-  pretty (Sym f) = PP.pretty f
-
-
--- applicative view of term
 
 -- | View for applicative terms
 data AView f v = TVar v -- ^ Variable
@@ -169,4 +163,23 @@ funsDL :: ATerm f v -> [f] -> [f]
 funsDL t fs = [f | (Sym f) <- T.funsDL t [Sym f | f <- fs]]
 
 
+
+-- | pretty printers
+
+instance PP.Pretty f => PP.Pretty (ASym f) where
+  pretty App = PP.text "@"
+  pretty (Sym f) = PP.pretty f
+
+prettyATerm :: (PP.Pretty f, PP.Pretty v) => ATerm f v -> PP.Doc
+prettyATerm = pp id
+  where 
+    pp _ (Var v) = PP.pretty v
+    pp _ (atermM -> Just (TFun f ts)) = 
+      PP.pretty f PP.<> PP.parens (ppSeq (PP.text ", ") [ pp id ti | ti <- ts])
+    pp par (atermM -> Just (t1 :@ t2)) =
+      par (pp id t1 PP.</> pp PP.parens t2)
+    pp _ _ = PP.text "NON-WELL-FORMED-TERM"    
+    ppSeq _ [] = PP.empty
+    ppSeq _ [a] = a
+    ppSeq s (a:as) = PP.align (a PP.<//> PP.cat [s PP.<> a' | a' <- as])
 
