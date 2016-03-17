@@ -33,8 +33,8 @@ applicativeArity rs = \ f -> Map.findWithDefault 0 f m
     aa l [] = l
     aa l ((T.aterm -> T.TVar _ ):ts) = aa l ts    
     aa l ((T.aterm -> (T.TFun _ ts')):ts) = aa l (ts'++ts)
-    aa l ((T.aform -> Just (T.atermM -> Just (T.TFun f thd),tas)):ts) = 
+    aa l ((T.aformM -> Just (T.atermM -> Just (T.TFun f thd),tas)):ts) = 
       aa ((f,length tas) : l) (thd ++ tas ++ ts)
-    aa l ((T.aform -> Just (_,tas)):ts) = aa l (tas ++ ts)
+    aa l ((T.aformM -> Just (_,tas)):ts) = aa l (tas ++ ts)
     aa l (_:ts) = aa l ts
     terms = concatMap (\ (R.Rule l r) -> [l,r]) rs

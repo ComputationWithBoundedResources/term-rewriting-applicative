@@ -1,5 +1,5 @@
 name:          term-rewriting-applicative
-version:       0.1
+version:       0.2
 stability:     experimental
 author:        Martin Avanzini, Ugo Dal Lago
 maintainer:    Martin Avanzini <martin.avanzini@uibk.ac.at>
@@ -37,5 +37,6 @@ library
               , TypeOperators
               , ViewPatterns
               , TupleSections
+              , PatternSynonyms
     ghc-options:       
      -threaded -Wall -O2 -fno-warn-orphans -fno-spec-constr-count -rtsopts -with-rtsopts=-N

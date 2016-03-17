@@ -6,6 +6,7 @@ module Data.Rewriting.Applicative.Term
          -- * Types and Constructors
          ASym (..)
        , AView (..)
+       , pattern TConst
        , ATerm
        , atermM
        , aterm
@@ -15,6 +16,7 @@ module Data.Rewriting.Applicative.Term
          -- * Operations on Terms
        , wellformed
        , aform
+       , aformM         
        , hd         
        , args
        , amap
@@ -88,6 +90,7 @@ data AView f v = TVar v -- ^ Variable
                | TFun f [ATerm f v] -- ^ n-ary function application 
                | ATerm f v :@ ATerm f v -- ^ application
 
+pattern TConst f = TFun f []
 
 -- | constructs applicative view of a term, returns 'Nothing' iff the given term is not 'wellformed'
 atermM :: ATerm f v -> Maybe (AView f v)
@@ -106,21 +109,24 @@ aterm = fromJust . atermM
 --
 -- prop> wellformed t ==> isJust (aform t)
 --
--- prop> aform t == Just (s,ts)  ==>  hd t == Just s && args t == ts
-aform :: ATerm f v -> Maybe (ATerm f v, [ATerm f v])
-aform (atermM -> Nothing) = Nothing
-aform (atermM -> Just (t1 :@ t2)) = do
-  (c,as) <- aform t1
+-- prop> aformM t == Just (s,ts)  ==>  hd t == Just s && args t == ts
+aformM :: ATerm f v -> Maybe (ATerm f v, [ATerm f v])
+aformM (atermM -> Nothing) = Nothing
+aformM (atermM -> Just (t1 :@ t2)) = do
+  (c,as) <- aformM t1
   return (c, as ++ [t2])
-aform t = return (t,[])
+aformM t = return (t,[])
+
+aform :: ATerm f v -> (ATerm f v, [ATerm f v])
+aform = fromJust . aformM
 
 -- | Returns the head of an applicative term, see 'aform'
 hd :: ATerm f v -> Maybe (ATerm f v)
-hd t = fst <$> aform t
+hd t = fst <$> aformM t
 
 -- | Returns the arguments of an applicative term, see 'aform'
 args :: ATerm f v -> Maybe [ATerm f v]
-args t = snd <$> aform t
+args t = snd <$> aformM t
 
 -- | Similar to 'Data.Rewriting.Term.map'
 amap :: (f -> f') -> (v -> v') -> ATerm f v -> ATerm f' v'
