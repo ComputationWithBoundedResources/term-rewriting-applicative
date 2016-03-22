@@ -53,7 +53,6 @@ type ATerm f v = T.Term (ASym f) v
 
 
 -- constructors
-
 -- | a term is well-formed if all occurrences of the application symbol 'App' are binary
 --
 -- >>> wellformed (T.Fun App [T.Var 'x', T.Var 'y'])
@@ -180,6 +179,7 @@ prettyATerm :: (PP.Pretty f, PP.Pretty v) => ATerm f v -> PP.Doc
 prettyATerm = pp id
   where 
     pp _ (Var v) = PP.pretty v
+    pp _ (atermM -> Just (TConst f)) = PP.pretty f
     pp _ (atermM -> Just (TFun f ts)) = 
       PP.pretty f PP.<> PP.parens (ppSeq (PP.text ", ") [ pp id ti | ti <- ts])
     pp par (atermM -> Just (t1 :@ t2)) =

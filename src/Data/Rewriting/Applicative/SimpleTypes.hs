@@ -8,6 +8,9 @@ module Data.Rewriting.Applicative.SimpleTypes(
        , Signature
        , Env
        , lookupEnv
+       , envToMap
+       , envFromMap
+       , extendEnv
          -- * Typed Terms
        , STTerm
        , withType
@@ -33,7 +36,7 @@ import qualified Data.Rewriting.Substitution.Type as ST
 import           Data.Rewriting.Substitution.Unify (unify)
 
 import           Data.Rewriting.Applicative.Term (ASym (..), ATerm, atermM, aterm, AView (..))
-import qualified Data.Rewriting.Applicative.Term as AT
+
 import           Data.Rewriting.Applicative.Rule (ARule, mapSides)
 import           Data.List (nub)
 import           Data.Maybe (fromJust, isNothing)
@@ -78,6 +81,16 @@ app t1 t2 =
 
 lookupEnv :: Ord v => v -> Env v -> Maybe Type
 lookupEnv v (Env m) = Map.lookup v m
+
+extendEnv :: Ord v => Env v -> v -> Type -> Env v
+extendEnv (Env m) v t = Env (Map.insert v t m)
+
+envToMap :: Env v -> Map.Map v Type
+envToMap (Env m) = m
+
+envFromMap :: Map.Map v Type -> Env v
+envFromMap = Env
+
 
 withType :: (Ord v, Ord f) => Env v -> Signature f -> ATerm f v -> Maybe (STTerm f v)
 withType env sig t =
@@ -260,7 +273,7 @@ instance PP.Pretty v => PP.Pretty (Env v) where
       
 instance (PP.Pretty f, PP.Pretty v) => PP.Pretty (STRule f v) where
   pretty rl = PP.pretty (ruleEnv rl)
-    PP.<+> PP.text "|-"
+    PP.<+> PP.text "⊢"
     PP.</> PP.hang 2 (rule (untypedRule rl) PP.<+> PP.text ":" PP.<+> PP.pretty (ruleType rl))
     where
       rule (R.Rule l r) = AT.prettyATerm l PP.<+> PP.text "->" PP.</> AT.prettyATerm r
