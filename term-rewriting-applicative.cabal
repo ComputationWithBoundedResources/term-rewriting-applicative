@@ -1,5 +1,5 @@
 name:          term-rewriting-applicative
-version:       0.2
+version:       0.2.1
 stability:     experimental
 author:        Martin Avanzini, Ugo Dal Lago
 maintainer:    Martin Avanzini <martin.avanzini@uibk.ac.at>
@@ -29,7 +29,7 @@ library
                  , base
                  , containers
                  , mtl
-                 , term-rewriting >= 0.2 && < 0.3
+                 , term-rewriting >= 0.2
     extensions: TypeSynonymInstances
               , FlexibleContexts
               , FlexibleInstances
